@@ -1,0 +1,202 @@
+/* public/style.css */
+
+#calendarGrid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+}
+
+.dayCell {
+    border: 1px solid #ccc;
+    padding: 8px;
+    min-height: 120px;
+}
+
+.dayNumber {
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+.slotItem {
+    border: 1px solid #ddd;
+    padding: 4px;
+    margin-bottom: 4px;
+    display: flex;
+    justify-content: space-between;
+    gap: 6px;
+}
+
+/* Message styles controlled by className in javadscript */
+.ok {
+    border: 1px solid #2e7d32;
+    padding: 8px;
+}
+
+.error {
+    border: 1px solid #c62828;
+    padding: 8px;
+}
+
+/* bonus example: highlight today */
+.today {
+    outline: 3px solid #1976d2;
+}
+
+
+
+
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 24px;
+    background-color: #f5f5f5;
+}
+
+h1 {
+    color: #333;
+}
+
+h2 {
+    color: #555;
+    margin-top: 32px;
+}
+
+#message {
+    min-height: 24px;
+    padding: 8px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+label {
+    display: block;
+    margin-top: 12px;
+    font-weight: bold;
+    color: #333;
+}
+
+input, select {
+    width: 340px;
+    padding: 8px;
+    margin-top: 4px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+select {
+    width: 358px;
+}
+
+.button-group {
+    margin-top: 16px;
+    display: flex;
+    gap: 12px;
+}
+
+button {
+    color: black;
+    background-color: lightgray;
+    padding: 10px 20px;
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+#submitBtn {
+    background-color: #4CAF50;
+    color: white;
+}
+
+#submitBtn:hover {
+    background-color: #45a049;
+}
+
+#deleteBtn {
+    background-color: #f44336;
+    color: white;
+}
+
+#deleteBtn:hover {
+    background-color: #da190b;
+}
+
+.error {
+    color: #b00020;
+    background-color: #ffebee;
+}
+
+.ok {
+    color: #0b6b0b;
+    background-color: #e8f5e9;
+}
+
+table {
+    border-collapse: collapse;
+    margin-top: 16px;
+    width: 100%;
+    max-width: 900px;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+}
+
+th {
+    background-color: #6da0cc;
+    color: black;
+    font-weight: bold;
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+
+.delete-btn {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.delete-btn:hover {
+    background-color: #b02a37;
+}
+
+.button-row {
+    display: flex;
+    gap: 10px;          
+
+.back-btn {
+    background-color: #6c757d;
+    color: white;
+    padding: 6px 12px;
+    text-decoration: none;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.back-btn:hover {
+    background-color: #545b62;
+}
+
+
+.button-row {
+    display: flex;
+    gap: 10px;
+}
+}

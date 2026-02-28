@@ -1,0 +1,50 @@
+<!-- public/provider.html -->
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Provider Calendar</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+ <h1 id="monthTitle"></h1>
+
+ <div id="message"></div>
+
+ <section id="createSlotPanel">
+    <h2>Create an advising appointment</h2>
+
+    <label>Start time</label>
+       <input id="startTimeInput" type="datetime-local">
+    
+
+    <label>End time</label>
+        <input id="endTimeInput" type="datetime-local">
+    
+    <label>Status</label>
+    <select id="myStatus" name="myStatus" type="text">
+            <option value="Available">Available</option>
+            <option value="Booked">Booked</option>
+    </select>
+    <label>Student name</label>
+        <input id="myName" type="text" placeholder="your name">
+
+    <button id="createSlotButton">Create Slot</button>
+ </section>
+
+ <section>
+    <h2>Month view</h2>
+    <div id="calendarGrid"></div>
+ </section>
+
+    <!-- Script runs after the DOM exists -->
+    <script src="provider.js"></script>
+    
+
+</body>
+
+
+
+</html>
