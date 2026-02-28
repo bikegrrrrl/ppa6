@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "startTime": "2026-02-01T09:00",
+    "endTime": "2026-02-01T09:30",
+    "myStatus": "Available", 
+    "myName": "Tavi"
+  },
+  {
+    "id": 2,
+    "startTime": "2026-02-01T10:00",
+    "endTime": "2026-02-01T10:30",
+    "myStatus": "Available", 
+    "myName": "Phil"
+  }
+]

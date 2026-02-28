@@ -42,7 +42,8 @@ function showMessage(text, kind) {
 function refreshCalendar() {
 
     const xhr = new XMLHttpRequest();
-    xhr.open("GET", "/api/slots");
+    xhr.open("GET", "/appointments");
+    //xhr.open("GET", "/api/slots");
 
     xhr.onload = function () {
         if (xhr.status === 200) {
@@ -479,100 +480,4 @@ function deleteSlot(id) {
 
     
 }
-*/
-/*
-// Load all slots initially
-function loadSlots() {
-    const xhr = new XMLHttpRequest();
-    xhr.open("GET", "/api/slots");
-
-    xhr.onload = function() {
-        if (xhr.status === 200) {
-            const parsed = parseJsonSafely(xhr.responseText);
-            if (!parsed.ok) {
-                setMessage("Failed to parse slots from server", "error");
-                return;
-            }
-
-            const slots = parsed.value;
-
-            // sort by start date
-            slots.sort((a, b) => {
-                return new Date(a.startTime) - new Date(b.startTime);
-            });
-
-            // Clear existing table rows first
-            const tbody = document.getElementById("slotTableBody");
-            tbody.innerHTML = "";
-
-            // Add each slot to the table
-            slots.forEach(addSlotRow);
-
-            setMessage("Appointments loaded successfully!", "ok");
-        } else {
-            setMessage("Failed to load slots from server", "error");
-        }
-    };
-
-    xhr.onerror = function() {
-        setMessage("Network error while loading slots", "error");
-    };
-    xhr.send();
-}
-
-
-document.getElementById("slotForm").addEventListener("submit", function(event) {
-
-    event.preventDefault();
-
-    const startTime = document.getElementById("startTime").value;
-    const endTime = document.getElementById("endTime").value;
-    const myStatus = document.getElementById("myStatus").value;
-    const myName = document.getElementById("myName").value;
-
-    submitNewSlot(startTime, endTime, myName, myStatus);
-
-});
-
-
-
-
-
-
-// Load slots when button is clicked
-document.getElementById("loadSlotsBtn").addEventListener("click", function() {
-    loadSlots();
-});
-
-// Listener to modify the endTime after a startTime is selected
-// auto-adds 30 minutes to start time
-document.getElementById("startTime").addEventListener("change", function () {
-
-    const startInput = document.getElementById("startTime");
-    const endInput = document.getElementById("endTime");
-
-    if (!startInput.value) return;
-
-    const startDate = new Date(startInput.value);
-
-    // Add 30 minutes
-    startDate.setMinutes(startDate.getMinutes() + 30);
-
-    // Remove 5 hours - somehow it's in UTC time, this fixes that 
-    startDate.setHours(startDate.getHours() - 6);
-
-    // Format correctly for datetime-local
-    const formatted = startDate.toISOString().slice(0, 16);
-
-    endInput.value = formatted;
-
-});
-
-
-
-// Load slots on page load
-document.addEventListener("DOMContentLoaded", loadSlots);
-
-// TODO re-load all slots upon adding new slot so they display in order
-
 */

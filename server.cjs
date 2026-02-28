@@ -2,10 +2,60 @@
 // Appointment scheduling server (PPA 3)
 // Uses Node.js http module only (no frameworks)
 // Sequential POST handling: parameters are passed in the URL query string
+"use strict";
+
 
 const http = require("http");
-
+// const url = require("url");
 const fs = require("fs");
+
+
+const DATA_FILE = "appointments.json";
+let appointments = [];
+
+function loadAppointments() {
+    // TODO list: decide what should happen if the file does not exist.
+    // TODO list: decide what should happen if the JSON is invalid.
+    // TODO list: decide whether to log errors to the console or stay silent.
+    try {
+        const text = fs.readFileSync(DATA_FILE, "utf8");
+        appointments = JSON.parse(text);
+        if (!Array.isArray(appointments)) {
+            appointments = [];
+        }
+    } catch (error) {
+        appointments = [];
+    }
+    
+}
+
+function saveAppointments() {
+    // TODO list: decide how you want the JSON formatted (pretty vs compact).
+    // TODO list: decide what to do if writing fails.
+    const text = JSON.stringify(appointments, null, 2);
+    fs.writeFileSync(DATA_FILE, text, "utf8");
+}
+
+
+function sendJson(response, statusCode, data) {
+
+    response.writeHead(statusCode, { "Content-Type": "application/json" });
+    response.end(JSON.stringify(data));
+
+}
+
+
+function sendText(response, statusCode, message) {
+    response.writeHead(statusCode, {"Content-Type": "text/plain"});
+    response.end(message);
+}
+
+loadAppointments();
+console.log(appointments)
+
+
+
+
 
 function serveHtml(res, filePath) {
     fs.readFile(filePath, function (err, content) {
@@ -19,56 +69,16 @@ function serveHtml(res, filePath) {
     });
 }
 
-// In memory data model (persistence added in PPA 4)
-
-// add to these as needed
-const slots = [
-  {
-    id: 1,
-    startTime: "2026-02-01T09:00",
-    endTime: "2026-02-01T09:30",
-    myStatus: "Available", 
-    myName: "Jen"
-  },
-  {
-    id: 2,
-    startTime: "2026-02-01T10:00",
-    endTime: "2026-02-01T10:30",
-    myStatus: "Available", 
-    myName: "John"
-  }
-];
-
-
-function sendJson(res, statusCode, payload) {
-
-    res.writeHead(statusCode, { "Content-Type": "application/json" });
-    res.end(JSON.stringify(payload));
-
-}
-
-
-
-/*
-
-function collectFormData() {
-    return {
-        name: document.getElementById("name").value,
-        email: document.getElementById("email").value
-    };
-}
-
-*/
 
 
 /* what i don't like about this is that if you start deleting timeslots, there's
 a chance the id numbers get corrupted */
-function nextId() {
+/*function nextId() {
 
     return slots.length + 1;
 
 }
-
+*/
 
 function validateSlotTimes(startTime, endTime) {
     
@@ -95,8 +105,8 @@ function validateSlotTimes(startTime, endTime) {
 
 function isDuplicate(startTime, endTime) {
    // return true if a slot with the same times already exists return false;
-    for (const s in slots) {
-        if (slots[s].startTime === startTime && slots[s].endTime === endTime) {
+    for (const s in appointments) {
+        if (appointments[s].startTime === startTime && appointments[s].endTime === endTime) {
             console.log ('>>> Dupe found')
             return true;
         }
@@ -108,9 +118,9 @@ function isDuplicate(startTime, endTime) {
 // Check time overlap
 function isOverlap(reqStartTime, reqEndTime) {
     // return true if timeslot overlaps any other timeslot
-    for (const s in slots) {
+    for (const s in appointments) {
         // Scenario: overlap where new timeslot overlaps beginning of another
-        if ((slots[s].startTime < reqEndTime) && (slots[s].endTime > reqStartTime)) {
+        if ((appointments[s].startTime < reqEndTime) && (appointments[s].endTime > reqStartTime)) {
             console.log("Requested timeslot overlaps on existing timeslot");
             return true;
         }
@@ -135,6 +145,20 @@ function isZeroDuration(reqStartTime, reqEndTime) {
 
 const server = http.createServer(function (req, res) {
     // const parsed = new URL(req.url, "http://localhost:3000");
+    
+    // Couses the error:
+    /*
+       const parsedUrl = url.parse(request.url, true);
+                      ^
+
+    ReferenceError: url is not defined
+    at Server.<anonymous> (/Users/lm28425/Documents/js_20262/ppa6/server.cjs:148:23)
+    at Server.emit (node:events:508:20)
+    at parserOnIncoming (node:_http_server:1213:12)
+    at HTTPParser.parserOnHeadersComplete (node:_http_common:123:17)
+    */
+    //const parsedUrl = url.parse(request.url, true);
+    
     const parsedUrl = new URL(req.url, "http://localhost:3000");
     const path = parsedUrl.pathname;
     const query = Object.fromEntries(parsedUrl.searchParams.entries());
@@ -144,16 +168,8 @@ const server = http.createServer(function (req, res) {
     if (req.url === "/index") { filePath = "./public/index.html"; }
     if (req.url === "/provider") { filePath = "./public/provider.html"; }
     if (req.url === "/client") { filePath = "./public/client.html"; }
-    if (req.url === "/appt") { filePath = "./public/appt.html"; }
     
-
-    /*if (req.method === "GET" && path === "/api/slots") {
-    
-        sendJson(res, 200, slots);
-        return;
-    }
-    */
-   if (req.method === "GET" && path === "/api/slots") {
+   /*if (req.method === "GET" && path === "/api/slots") {
     // check if query.id is provided
     if (query.id) {
         const slotId = parseInt(query.id, 10);
@@ -170,6 +186,116 @@ const server = http.createServer(function (req, res) {
     sendJson(res, 200, slots);
     return;
 }
+    */
+
+            // Serve stylesheet
+    if (req.url === "/style.css") {
+        fs.readFile("./public/style.css", function(err, content) {
+            if (err) {
+                res.writeHead(500);
+                res.end("File not found");
+                return;
+            }
+            res.writeHead(200, { "Content-Type": "text/css" });
+            res.end(content);
+        });
+        return;
+    }
+
+    // Serve  utils
+    if (req.url === "/utils.js") {
+        fs.readFile("./public/utils.js", function(err, content) {
+            if (err) {
+                res.writeHead(500);
+                res.end("File not found");
+                return;
+            }
+            res.writeHead(200, { "Content-Type": "application/javascript" });
+            res.end(content);
+        });
+        return;
+    }
+
+    // serve provider.js
+    if (path === "/provider.js") {
+    fs.readFile("./public/provider.js", function(err, content) {
+        if (err) {
+            res.writeHead(404);
+            res.end("File not found");
+            return;
+        }
+        res.writeHead(200, { "Content-Type": "application/javascript" });
+        res.end(content);
+    });
+    return;
+}
+
+    if (path === "/provider") {
+        serveHtml(res, "./public/provider.html");
+        console.log("provider served up")
+        return;
+    }
+
+    if (path === "/client") {
+        serveHtml(res, "./public/client.html");
+        return;
+    }
+
+    // Serve up index.html for / or /index
+    if (path === "/" || path === "/index") {
+        serveHtml(res, "./public/index.html");
+        return;
+    }
+
+    if (req.method === "GET" && parsedUrl.pathname === "/appointments") {
+        sendJson(res, 200, appointments);
+    }
+    else if (req.method === "POST" && parsedUrl.pathname === "/appointments") {
+        // NOTE: reading the request body is event driven, but your file operations are synchronous.
+        let body = "";
+        
+        req.on("data", function(chunk) {
+            body += chunk;
+        });
+
+        req.on("end", function() {
+            // TODO list: validate the incoming appointment fields before pushing into the array.
+            const newAppointment = JSON.parse(body);
+            appointments.push(newAppointment);
+            saveAppointments();
+            sendText(res, 200, "TODO");
+        });
+    }
+    else if (req.method === "DELETE" && parsedUrl.pathname.startsWith("/appointments/")) {
+        const parts = parsedUrl.pathname.split("/");
+        const index = Number(parts[2]);
+        
+        // TODO list: decide what error message to send for an invalid index.
+        if (!Number.isNaN(index) && index >= 0 && index < appointments.length) {
+            appointments.splice(index, 1);
+            saveAppointments();
+            sendText(res, 200, "TODO");
+        } else {
+            sendText(res, 400, "TODO");    
+        }
+    }
+    else {
+        sendText(res, 404, "TODO");
+    }
+
+
+
+    // ends server fcn
+});
+
+
+
+server.listen(3000);
+console.log("Server running on 3000");
+
+
+/*
+
 
     if (path === "/provider") {
         serveHtml(res, "./public/provider.html");
@@ -203,20 +329,6 @@ const server = http.createServer(function (req, res) {
         });
         return;
     }
-
-    if (req.url === "/appt.js") {
-        fs.readFile("./public/appt.js", function(err, content) {
-            if (err) {
-                res.writeHead(404, { "Content-Type": "text/plain" });
-                res.end("File not found");
-                return;
-            }
-            res.writeHead(200, { "Content-Type": "application/javascript" });
-            res.end(content);
-        });
-        return;
-    }
-
 
         // Serve stylesheet
     if (req.url === "/style.css") {
@@ -304,3 +416,6 @@ const server = http.createServer(function (req, res) {
 server.listen(3000, function (){
     console.log("Server running at http://localhost:3000");
 })
+
+
+*/
