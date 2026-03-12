@@ -68,10 +68,15 @@ function showMessage(text, kind) {
 // GET all slots then re render the month view
 function refreshCalendar() {
 
+    // new request
     const xhr = new XMLHttpRequest();
+    // configure the GET for the appointments to refresh
     xhr.open("GET", "/appointments");
     //xhr.open("GET", "/api/slots");
 
+    // event handler
+    // parse the json from the appointments
+    // render the calendar
     xhr.onload = function () {
         if (xhr.status === 200) {
             const rawSlots = JSON.parse(xhr.responseText);
@@ -84,6 +89,9 @@ function refreshCalendar() {
         }
     };
 
+    // xhr.setRequestHeader can also be used here to set headers (optional)
+
+    // send the request (in this case a GET to render)
     xhr.send();
 }
 
@@ -91,7 +99,9 @@ function refreshCalendar() {
 // Render the month grid, then insert slot items into each day cell
 function renderCalendar(rawSlots) {
 
+    // Gte current month, year in text
     setMonthTitle(currentMonth, currentYear);
+
 
     const grid = document.getElementById("calendarGrid");
     grid.innerHTML = "";
@@ -213,12 +223,13 @@ function auditTimeInputs(startTime, endTime) {
 // Send POST the new timeslot then refresh the calendar on success
 function sendCreateSlot(startTime, endTime, myStatus, myName) {
 
+    // new request
     const xhr = new XMLHttpRequest();
-
+    // configure the request as a POST (establish new resources) to appts
     xhr.open("POST", "/appointments");
     // added for server
     xhr.setRequestHeader("Content-Type", "application/json");
-
+    // event handler - what to do
     xhr.onload = function () {
 
         if (xhr.status === 201) {
@@ -234,6 +245,7 @@ function sendCreateSlot(startTime, endTime, myStatus, myName) {
     };
 
     // added for JSON.parse(body) in server
+    // converts js object to a JSON string
     xhr.send(JSON.stringify({
         startTime,
         endTime,
@@ -362,14 +374,15 @@ modalDeleteButton.addEventListener("click", function() {
     if (!confirmDelete) return;
 
     // Send DELETE request to server
+
     const xhr = new XMLHttpRequest();
-    console.log(currentSlot.id);
+    // configure request
     xhr.open("DELETE", `/appointments/${Number(currentSlot.id)}`);
-    console.log("after open");
+    // event handler
     xhr.onload = function() {
-        console.log("status:", xhr.status)
         if (xhr.status === 200) {
             showMessage("Appointment deleted", "ok");
+            // important: refresh calendar without deleted appt
             refreshCalendar();
             modal.style.display = "none";
         } else {
@@ -378,6 +391,7 @@ modalDeleteButton.addEventListener("click", function() {
             showMessage(data.error || "Delete failed else", "error");
         }
     };
+    // send the request 
     xhr.send();
 });
 

@@ -1,5 +1,5 @@
 // server.js
-// Appointment scheduling server (PPA 3)
+// Appointment scheduling server
 // Uses Node.js http module only (no frameworks)
 // Sequential POST handling: parameters are passed in the URL query string
 "use strict";
@@ -22,20 +22,29 @@ function loadAppointments() {
         appointments = JSON.parse(text);
         if (!Array.isArray(appointments)) {
             appointments = [];
+        return {ok: true };
         }
     } catch (error) {
+        // Logging errors to console for now
+        console.log("ERROR loading appts");
         appointments = [];
+        return {ok: false, message: "Error loading appointments"};
     }
     
 }
 
 function saveAppointments() {
     // TODO list: decide how you want the JSON formatted (pretty vs compact).
-    // TODO list: decide what to do if writing fails.
-    const text = JSON.stringify(appointments, null, 2);
-    fs.writeFileSync(DATA_FILE, text, "utf8");
-}
+    try {
+        const text = JSON.stringify(appointments, null, 2);
+            fs.writeFileSync(DATA_FILE, text, "utf8");
+            return {ok: true};
+    } catch (error) {
+        return {ok: false, message: "Could not save appointment"};
 
+    }
+}
+ 
 
 function sendJson(response, statusCode, data) {
 
@@ -76,6 +85,17 @@ a chance the id numbers get corrupted */
 
 }
 */
+
+/*
+function validateSlotStatus(myName, myStatus) {
+    if (myStatus === 'Booked' && myName == '' ) {
+        return false; //{ok: false, message: "A booked appointment must have a student name"};
+    } else {
+        return true; //{ok: true, message: "" };
+    }
+}
+*/
+
 
 function validateSlotTimes(startTime, endTime) {
     
@@ -154,13 +174,17 @@ function validateAppt(startTime, endTime) {
     if (isZeroDuration(startTime, endTime))
         return { ok: false, message: "Appointments must be at least 1 minute long"
     };
+    //if (!validateSlotStatus(myName, myStatus))
+    //    return {ok: false, message: "Booked appointments must have a student name"
+    //}
+
     return {ok: true};
 }
 
 const server = http.createServer(function (req, res) {
     // const parsed = new URL(req.url, "http://localhost:3000");
     
-    // Couses the error:
+    // Causes the error:
     /*
        const parsedUrl = url.parse(request.url, true);
                       ^
