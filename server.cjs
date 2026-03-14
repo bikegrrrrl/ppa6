@@ -107,7 +107,7 @@ function validateSlotTimes(startTime, endTime) {
         return { ok: false, message: "endTime is required" };
     }
     // (bonus): verify endTime is after startTime
-    if (endTime < startTime) {
+    if (endTime <= startTime) {
         return {ok: false, message: "startTime must be before endTime"}
     }
 

@@ -281,3 +281,19 @@ tr:hover {
 .slotItem:hover {
   opacity: 0.9;
 }
+
+/* calendar month */
+.calendar-header {
+  padding: 12px 20px;
+}
+
+.calendar-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+#monthTitle {
+  margin: 0;
+}

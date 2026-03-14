@@ -255,19 +255,54 @@ function sendCreateSlot(startTime, endTime, myStatus, myName) {
 
 }
 
-
-// Update the month title header
+// Handle Month on calendar title and clicking through months
 function setMonthTitle(month, year) {
+    // subtract 1 because of indexing months in js
+    const date = new Date(year, month-1);
 
     const names = [
         "January","February","March","April","May","June",
     "July","August","September","October","November","December"
     ];
-    
-    document.getElementById("monthTitle").textContent =
-        names[month - 1] + " " + String(year);
 
+    const options = {
+        month: "long",
+        year: "numeric"
+    };
+
+    document.getElementById("monthTitle").textContent =
+        date.toLocaleString(undefined, options);
 }
+
+// handlers for month previous and next buttons
+document.getElementById("prevMonth")
+.addEventListener("click", function () {
+
+    currentMonth--;
+
+    if (currentMonth < 0) {
+        currentMonth = 11;
+        // subtract 1
+        currentYear--;
+    }
+
+    refreshCalendar();
+});
+
+
+document.getElementById("nextMonth")
+.addEventListener("click", function () {
+
+    currentMonth++;
+
+    if (currentMonth > 11) {
+        currentMonth = 0;
+        // add 1
+        currentYear++;
+    }
+
+    refreshCalendar();
+});
 
 
 // Button click creates a slot
@@ -297,7 +332,7 @@ document.getElementById("startTimeInput").addEventListener("change", function ()
     startDate.setMinutes(startDate.getMinutes() + 30);
 
     // Remove 5 hours - somehow it's in UTC time, this fixes that 
-    startDate.setHours(startDate.getHours() - 6);
+    startDate.setHours(startDate.getHours() - 5);
 
     // Format correctly for datetime-local
     const formatted = startDate.toISOString().slice(0, 16);
@@ -323,32 +358,18 @@ function formatDateTime(isoString) {
     return date.toLocaleString(undefined, options);
 }
 
+
 const modal = document.getElementById("appointmentModal");
 const modalClose = document.getElementById("modalClose");
 
-function openModal(slot) {
-    document.getElementById("modalStartTime").textContent = formatDateTime(slot.startTime);
-    document.getElementById("modalEndTime").textContent = formatDateTime(slot.endTime);
-    document.getElementById("modalStatus").textContent = slot.myStatus;
-    document.getElementById("modalName").textContent = slot.myName;
-
-    modal.style.display = "block";
-}
-
-modalClose.addEventListener("click", function() {
-    modal.style.display = "none";
-});
-
-// Close modal if clicking outside content
-window.addEventListener("click", function(event) {
-    if (event.target === modal) {
-        modal.style.display = "none";
-    }
-});
-
-
-// Delete button logic
 const modalDeleteButton = document.getElementById("modalDeleteButton");
+
+// reschedule
+let reschedule = false;
+const modalRescheduleButton = document.getElementById("modalRescheduleButton");
+const rescheduleStart = document.getElementById("rescheduleStart");
+const rescheduleEnd = document.getElementById("rescheduleEnd");
+
 
 let currentSlot = null; // track which slot is currently open
 
@@ -360,8 +381,27 @@ function openModal(slot) {
     document.getElementById("modalStatus").textContent = slot.myStatus;
     document.getElementById("modalName").textContent = slot.myName;
 
+    // input for patch
+    // Prefill reschedule inputs
+    rescheduleStart.value = slot.startTime.slice(0,16);
+    rescheduleEnd.value = slot.endTime.slice(0,16);
+
+
     modal.style.display = "block";
 }
+
+modalClose.addEventListener("click", function() {
+    modal.style.display = "none";
+});
+
+
+// Close modal if clicking outside content
+window.addEventListener("click", function(event) {
+    if (event.target === modal) {
+        modal.style.display = "none";
+    }
+});
+
 
 // Delete the appointment
 modalDeleteButton.addEventListener("click", function() {

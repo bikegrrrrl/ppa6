@@ -1,10 +1,9 @@
-# ppa6
+# ppa7
 
-## Improvements
-* saves to local json
-* display appointment over calendar with modal
-* delete button    
-
+## New for this release
+* PUT and PATCH to update event details
+* Navigate between months on calendar
+* 
 
 ## Features
 
@@ -18,11 +17,16 @@
 * Added auto-population of endTime based on selected startTime by 30 minutes
 * Added utils.js to serve up modules that can be reused
 * Used new css and calendar display layout
-* includes calendar
+* includes calendar layout
 * highlights today's date
 * banner messages fade away after 15 
 * Display start time and name on timeslot
 * dynamic color on timeslot to show status - accessible, colorblind compatible
+* saves to local json
+* display appointment over calendar with modal
+* delete button   
+
+
 
 
 ### obsolete changes
