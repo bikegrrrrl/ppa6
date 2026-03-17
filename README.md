@@ -6,7 +6,6 @@
 * 
 
 ## Features
-
 * Checks for duplicate time slot
 * Uses CSS
 * Allows add name to timeslot

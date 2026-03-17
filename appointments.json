@@ -7,20 +7,6 @@
     "myName": "Tavi"
   },
   {
-    "startTime": "2026-03-14T20:50",
-    "endTime": "2026-03-14T21:20",
-    "myStatus": "Booked",
-    "myName": "Phil",
-    "id": 1772760777723
-  },
-  {
-    "startTime": "2026-03-14T09:16",
-    "endTime": "2026-03-14T09:46",
-    "myStatus": "Booked",
-    "myName": "Tavi",
-    "id": 1773454639039
-  },
-  {
     "startTime": "2026-03-11T21:22",
     "endTime": "2026-03-11T21:52",
     "myStatus": "Booked",

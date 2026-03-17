@@ -1,8 +1,7 @@
 // public/provider.js
-// Provider calendar UI for PPA 5
-// GET and POST only
 
 
+// What day is it?
 const now = new Date();
 let currentMonth = now.getMonth() + 1;
 let currentYear = now.getFullYear();
@@ -30,14 +29,7 @@ function highlightToday() {
 }
 
 
-// Show a user facing message
-/* function showMessage(text, kind) {
-    const el = document.getElementById("message");
-    el.textContent = text;
-    el.className = kind;
-}
-*/
-
+// Displaying messages
 let messageTimeout = null;
 
 function showMessage(text, kind) {
@@ -72,26 +64,19 @@ function refreshCalendar() {
     const xhr = new XMLHttpRequest();
     // configure the GET for the appointments to refresh
     xhr.open("GET", "/appointments");
-    //xhr.open("GET", "/api/slots");
 
     // event handler
-    // parse the json from the appointments
-    // render the calendar
     xhr.onload = function () {
         if (xhr.status === 200) {
+            // parse the json from the appointments
             const rawSlots = JSON.parse(xhr.responseText);
             renderCalendar(rawSlots);
 
         } else {
-
             showMessage("GET failed " + String(xhr.status), "error");
-
         }
     };
 
-    // xhr.setRequestHeader can also be used here to set headers (optional)
-
-    // send the request (in this case a GET to render)
     xhr.send();
 }
 
@@ -207,7 +192,7 @@ function renderCalendar(rawSlots) {
 }
 
 
-// Audit time
+// Audit required fields
 // Before send, if inputs are empty, send message
 function auditTimeInputs(startTime, endTime) {
     if ( startTime == undefined ) {
@@ -233,12 +218,10 @@ function sendCreateSlot(startTime, endTime, myStatus, myName) {
     xhr.onload = function () {
 
         if (xhr.status === 201) {
-
             showMessage("Slot created", "ok");
             refreshCalendar();
 
         } else {
-
             const data = JSON.parse(xhr.responseText || "{}");
             showMessage(data.error || "Create failed", "error");
         }
@@ -362,37 +345,90 @@ function formatDateTime(isoString) {
 const modal = document.getElementById("appointmentModal");
 const modalClose = document.getElementById("modalClose");
 
-const modalDeleteButton = document.getElementById("modalDeleteButton");
-
-// reschedule
-let reschedule = false;
-const modalRescheduleButton = document.getElementById("modalRescheduleButton");
-const rescheduleStart = document.getElementById("rescheduleStart");
-const rescheduleEnd = document.getElementById("rescheduleEnd");
+// this button works
+const modalDeleteButton = document.getElementById("deleteBtn");
 
 
-let currentSlot = null; // track which slot is currently open
+
+let currentSlot = null; //
+let originalAppointment = null;  // appointment displayed in modal
+
 
 function openModal(slot) {
+    // TODO: display modal dialog
+    // TODO: populate fields with appointment data
+    // slot details
     currentSlot = slot; // store for deletion
 
-    document.getElementById("modalStartTime").textContent = formatDateTime(slot.startTime);
-    document.getElementById("modalEndTime").textContent = formatDateTime(slot.endTime);
-    document.getElementById("modalStatus").textContent = slot.myStatus;
-    document.getElementById("modalName").textContent = slot.myName;
+    // store original appointment for comparison later
+    originalAppointment = { ...slot };
 
-    // input for patch
-    // Prefill reschedule inputs
-    rescheduleStart.value = slot.startTime.slice(0,16);
-    rescheduleEnd.value = slot.endTime.slice(0,16);
-
+    // TODO the current dates and times don't get into the date time picker
+    document.getElementById("editStartTime").value = slot.startTime;
+    document.getElementById("editEndTime").value = slot.endTime;
+    document.getElementById("editStatus").value = slot.myStatus;
+    document.getElementById("editName").value = slot.myName;
 
     modal.style.display = "block";
 }
 
-modalClose.addEventListener("click", function() {
-    modal.style.display = "none";
-});
+// when user presses save
+function getEditedAppointment() {
+    return {
+        id: currentSlot.id,
+        startTime: document.getElementById("editStartTime").value,
+        endTime: document.getElementById("editEndTime").value,
+        myStatus: document.getElementById("editStatus").value,
+        myName: document.getElementById("editName").value
+    };
+}
+
+
+
+
+
+
+// save button applies changes
+
+function saveAppointmentChanges() {
+    console.log("save clicked");
+    const edited = getEditedAppointment();
+
+    const changes = {};
+
+    for (const key in edited) {
+        if (edited[key] !== originalAppointment[key]) {
+            changes[key] = edited[key];
+        }
+    }
+
+    if (Object.keys(changes).length === 0) {
+        alert("No changes made");
+        return;
+    }
+
+    const method = Object.keys(changes).length === 4 ? "PUT" : "PATCH";
+    const payload = method === "PUT" ? edited : changes;
+
+    const xhr = new XMLHttpRequest();
+    xhr.open(method, `/appointments/${currentSlot.id}`);
+    xhr.setRequestHeader("Content-Type", "application/json");
+
+    xhr.onload = function () {
+        refreshCalendar();
+        modal.style.display = "none";
+    };
+
+    xhr.send(JSON.stringify(payload));
+}
+
+
+
+
+// this was throwing a null error when landing on page the first time
+//modalClose.addEventListener("click", function() {
+//    modal.style.display = "none";
+//});
 
 
 // Close modal if clicking outside content
@@ -403,7 +439,7 @@ window.addEventListener("click", function(event) {
 });
 
 
-// Delete the appointment
+// Delete the appointment after button clicked
 modalDeleteButton.addEventListener("click", function() {
     if (!currentSlot || !currentSlot.id) {
         showMessage("Error: cannot delete, slot ID missing", "error");
@@ -413,27 +449,106 @@ modalDeleteButton.addEventListener("click", function() {
     const confirmDelete = confirm("Are you sure you want to delete this appointment?");
     if (!confirmDelete) return;
 
-    // Send DELETE request to server
+    deleteButtonHandler();
+    
+});
 
+
+
+function patchAppointment() {
+
+  const data = {
+    startTime: document.getElementById("editStartTime").value,
+    endTime: document.getElementById("editEndTime").value
+  };
+
+  const xhr = new XMLHttpRequest();
+  xhr.open("PATCH", `/appointments/${currentSlot.id}`);
+  xhr.setRequestHeader("Content-Type", "application/json");
+
+  xhr.onload = function() {
+    refreshCalendar();
+    modal.style.display = "none";
+  };
+
+  xhr.send(JSON.stringify(data));
+}
+
+
+
+
+function openAppointmentModal(appointment) {
+
+
+}
+
+function saveAppointmentChanges() {
+    // TODO: read form inputs
+    // TODO: construct updated appointment object
+
+    ["StartTime","EndTime","Status","Name"].forEach(field => {
+        document.getElementById("modal" + field).style.display = "none";
+        document.getElementById("edit" + field).style.display = "inline";
+    });
+
+
+    // TODO: PUT request to server
+    const data = {
+        startTime: document.getElementById("editStartTime").value,
+        endTime: document.getElementById("editEndTime").value,
+        myStatus: document.getElementById("editStatus").value,
+        myName: document.getElementById("editName").value,
+        id: currentSlot.id
+    };
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("PUT", `/appointments/${currentSlot.id}`);
+    xhr.setRequestHeader("Content-Type", "application/json");
+
+    xhr.onload = function() {
+        refreshCalendar();
+        modal.style.display = "none";
+    };
+
+    xhr.send(JSON.stringify(data));
+}
+
+
+const deleteButtonHandler = () => {
     const xhr = new XMLHttpRequest();
     // configure request
     xhr.open("DELETE", `/appointments/${Number(currentSlot.id)}`);
     // event handler
     xhr.onload = function() {
         if (xhr.status === 200) {
+            console.log('200 in client');
             showMessage("Appointment deleted", "ok");
-            // important: refresh calendar without deleted appt
+            // refresh calendar without deleted appt
             refreshCalendar();
             modal.style.display = "none";
         } else {
+            console.log('err in client');
             let data = {};
             try { data = JSON.parse(xhr.responseText); } catch {}
             showMessage(data.error || "Delete failed else", "error");
         }
     };
-    // send the request 
+    // send the request
+    console.log('send the request from client to server');
     xhr.send();
+}
+
+// after the dom loads
+document.addEventListener("DOMContentLoaded", () => {
+
+  const saveBtn = document.getElementById("saveBtn");
+
+  saveBtn.addEventListener("click", saveAppointmentChanges);
+
 });
 
 
+function closeAppointmentModal() {
+  document.getElementById("appointmentModal").style.display = "none";
+}
 

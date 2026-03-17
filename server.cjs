@@ -317,43 +317,57 @@ const server = http.createServer(function (req, res) {
             }
         });
     }
-    else if (req.method === "DELETE" && parsedUrl.pathname.startsWith("/appointments/")) {
-        const parts = parsedUrl.pathname.split("/");
-        const index = Number(parts[2]);
-        
-        // TODO list: decide what error message to send for an invalid index.
-        if (!Number.isNaN(index) && index >= 0 && index < appointments.length) {
-            appointments.splice(index, 1);
-            saveAppointments()
-            sendText(res, 200, ("Appointment deleted"));
-            //sendJson(res, 200, {error: "message json"});
-        }
-        else if (req.method === "DELETE" && parsedUrl.pathname.startsWith("/appointments/")) {
-            const parts = parsedUrl.pathname.split("/");
-            const id = Number(parts[2]);
-
-            const index = appointments.findIndex(a => a.id === id);
-
-            if (index !== -1) {
-                const deleted = appointments.splice(index, 1)[0];
-                saveAppointments();
-                sendJson(res, 200, deleted);
-            } else {
-                sendJson(res, 404, { error: "Appointment not found" });
-            }
-        } else {
-            sendText(res, 400, "An error has occurred");
-            //sendJson(res, 400, {error: "message json"});
-        }
+    else if (req.method === "DELETE") {
+        deleteAppointment(req, res, parsedUrl);
+        console.log('deleting with del function');
+        return;
     }
-    else {
-        sendText(res, 404, "TODO");
-    }
-    
-    
-    // ends server fcn
 });
 
+function openChangeTimeForm() {
+  // PATCH /appointments/:id
+  // TODO: locate the appointment by id
+  // TODO: merge provided fields
+  // TODO: validate the result
+  // TODO: save to appointments.json
+}
+
+function updateAppointmentFull(id, updatedAppointment) {
+    // PUT /appointments/:id
+    // TODO: locate the appointment by id
+    const index = appointments.findIndex(a => a.id === id);
+    
+    // TODO: validate appointment object
+    // TODO: replace the object
+    
+    // TODO: save to appointments.json
+    saveAppointments();  
+}
+
+function deleteAppointment(req, res, parsedUrl) {
+    if (req.method === "DELETE" && parsedUrl.pathname.startsWith("/appointments/")) {
+        // get id from url
+        const parts = parsedUrl.pathname.split("/");
+        const id = Number(parts[2]);
+        console.log("ID from URL:", id);
+        if (Number.isNaN(id)) {
+            sendJson(res, 400, { error: "Invalid appointment id" });
+            return;
+        }
+        // get appointment from id
+        const index = appointments.findIndex(a => a.id === id);
+        if (index !== -1) {
+            const deleted = appointments.splice(index, 1)[0];
+            saveAppointments();
+            console.log("Deleted appointment in appts.JSON:", deleted);
+            sendJson(res, 200, deleted);
+
+        } else {
+            console.log("Appointment not found");
+            sendJson(res, 404, { error: "Appointment not found" });
+        }
+    }
+}
 
 
 server.listen(3000);

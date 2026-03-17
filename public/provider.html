@@ -26,6 +26,7 @@
     
     <label>Status</label>
     <select id="myStatus" name="myStatus" type="text">
+            <option value="" disabled selected>Select status</option>
             <option value="Available">Available</option>
             <option value="Booked">Booked</option>
     </select>
@@ -52,41 +53,53 @@
     <div id="calendarGrid"></div>
  </section>
 
-<!-- Appointment Modal -->
+
+<!--  Appt modal with one form for all changes -->
 <div id="appointmentModal" class="modal">
   <div class="modal-content">
-    <span id="modalClose" class="close">&times;</span>
-    <h2>Appointment Details</h2>
-    <p><strong>Start:</strong> <span id="modalStartTime"></span></p>
-    <p><strong>End:</strong> <span id="modalEndTime"></span></p>
-    <p><strong>Status:</strong> <span id="modalStatus"></span></p>
-    <p><strong>Name:</strong> <span id="modalName"></span></p>
 
-<label>Start</label>
-<input type="datetime-local" id="rescheduleStart">
+    <h2 class="modal-title">Appointment Details</h2>
 
-<label>End</label>
-<input type="datetime-local" id="rescheduleEnd">
+    <form id="appointmentForm">
 
+    <div class="modal-body">
 
-     <!-- Delete button -->
-    <button id="modalDeleteButton" class="delete-btn">Delete Appointment</button>
-    <button id="modalRescheduleButton" class="submitBtn">Reschedule</button>
-  </div>
-</div>
+      <label>
+        Start
+        <input id="editStartTime" type="datetime-local" required>
+      </label>
 
-<!-- Reschedule Modal -->
-<div id="rescheduleModal" class="modal">
-  <div class="modal-content">
-    <span id="modalClose" class="close">&times;</span>
-    <h2>Reschedule your appointment</h2>
-    <p><strong>Start:</strong> <span id="modalStartTime"></span></p>
-    <p><strong>End:</strong> <span id="modalEndTime"></span></p>
-    <p><strong>Status:</strong> <span id="modalStatus"></span></p>
-    <p><strong>Name:</strong> <span id="modalName"></span></p>
-     <!-- Cancel button -->
-    <button id="modalCancelButton" class="cancel-btn">Cancel</button>
-    <button id="modalRescheduleButton" class="submitBtn">Reschedule</button>
+      <label>
+        End
+        <input id="editEndTime" type="datetime-local" required>
+      </label>
+
+      <label>Status:</label>
+      <select id="editStatus">
+          <option value="Available">Available</option>
+          <option value="Booked">Booked</option>
+      </select>
+
+      <label>
+        Name
+        <input id="editName" type="text">
+      </label>
+
+    </div>
+
+    <div class="modal-actions">
+
+      <button type="submit" id="saveBtn">
+        Save Changes
+      </button>
+
+      <button id="deleteBtn">
+        Delete Appointment
+      </button>
+
+    </div>
+    
+    </form>
   </div>
 </div>
 
